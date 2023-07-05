@@ -11,6 +11,7 @@ export default defineEventHandler(async (event) => {
   try {
     const sessionCookie = await getAuth().createSessionCookie(firebaseIdToken, {expiresIn: config.public.authCookieExpires});
     
+    
     setCookie(event, config.public.authCookieName, sessionCookie, {
       maxAge: config.public.authCookieExpires,
       sameSite: "strict",
@@ -20,6 +21,14 @@ export default defineEventHandler(async (event) => {
     });
     
     const token = await getAuth().verifySessionCookie(sessionCookie, true);
+
+    // ser custom claims
+    // doc https://firebase.google.com/docs/auth/admin/custom-claims
+    await getAuth().setCustomUserClaims(token.uid, {
+      admin: true,
+      username: "admin",
+    });
+
     const user = await getAuth().getUser(token.uid);
     return { user };
 
