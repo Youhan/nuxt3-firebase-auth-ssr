@@ -1,0 +1,21 @@
+import { initializeApp, cert, getApp } from "firebase-admin/app";
+
+const createFirebaseApp = () => {
+  const config = useRuntimeConfig();
+  try {
+    return getApp();
+  } catch {
+    const firebaseConfig = {
+      credential: cert({
+        projectId: config.firebaseadmin.projectId,
+        clientEmail: config.firebaseadmin.clientEmail,
+        privateKey: config.firebaseadmin.privateKey,
+      }),
+    };
+    return initializeApp(firebaseConfig);
+  }
+};
+
+export default defineNuxtPlugin(() => {
+  createFirebaseApp();
+});
