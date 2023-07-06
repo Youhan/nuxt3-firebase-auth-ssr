@@ -1,5 +1,8 @@
 import { initializeApp, cert, getApp } from "firebase-admin/app";
 
+/**
+ * Make sure that we initialize the firebase app only once
+ */
 const createFirebaseApp = () => {
   const config = useRuntimeConfig();
   try {

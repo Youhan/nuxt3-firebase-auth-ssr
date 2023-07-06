@@ -1,63 +1,32 @@
-# Nuxt 3 Minimal Starter
+# Nuxt 3 Firebase Auth
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
-## Setup
+I got the ideas from [damien-hl/nuxt3-auth-example](https://github.com/damien-hl/nuxt3-auth-example) and tried to integrate it with Firebase as the Auth provider. 
 
-Make sure to install the dependencies:
+## Key features
 
-```bash
-# npm
-npm install
+1. Based on nuxt 3
+2. Firebase Auth (Google oAuth)
+3. SSR support
+4. Server side cookie based auth
 
-# pnpm
-pnpm install
+## How it works
 
-# yarn
-yarn install
-```
+The idea is to authenticate the user using Firebase client Auth library. Then we get an `idToken` as a result of successful authentication. We then send the `idToken` to a Nuxt 3 server route. The server route is named `login.post.ts`. It uses the token to ask Firebase to create a session cookie using `firebase-admin`. Then we set that cookie for the browser along with any custom claims. We then return the `User` object back to the client.
 
-## Development Server
+The client sets the User object and makes it accessible for the app using Nuxt's `useState` composable.
 
-Start the development server on `http://localhost:3000`:
+Now on any subsequent client side navigation, the User state is available and the app can use it by `const user = useAuthUser()`.
 
-```bash
-# npm
-npm run dev
+Now if you reload the page, there is a plugin named `plugins/auth.ts` that awaits for response of a request to a server route and asks for the user. The `api/auth/me` reads the cookie, gets the user object from Firestore and sends the User object back or sends null. All of this will happen on the server without any HTTP calls thanks to Nuxt 3 Nitro and H3. If it gets a user object back, it sets the state. Then all the middleware and other parts of the app can use the User object.
 
-# pnpm
-pnpm run dev
+Hope this helps someone.
 
-# yarn
-yarn dev
-```
+## How to setup and run 
 
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+1. Clone the repo
+2. Create a Firebase project and get your config
+3. Create a service account in Firebase dashboard and download the json file
+4. Enable Google oAuth in Firebase dashboard
+5. Using 2 and 3, create a `.env` file in the root of the project (use the env.sample as a template)
+6. `yarn install` and `yarn dev` to run the project
